@@ -3,38 +3,41 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Location;
 
 class Transaction extends Model
 {
     protected $connection = 'transaction';
 
     protected $fillable = [
-        'transaction_type',
+        'transaction_number',
+        'type',
         'source_location_id',
         'destination_location_id',
-        'transaction_date',
-        'reference_number',
-        'notes',
-        'created_by'
+        'notes'
     ];
 
     protected $casts = [
         'transaction_date' => 'datetime'
     ];
 
-    public function details()
+    public function details(): HasMany
     {
-        return $this->hasMany(TransactionDetail::class, 'transaction_id');
+        return $this->hasMany(TransactionDetail::class);
     }
 
-    public function sourceLocation()
+    public function sourceLocation(): BelongsTo
     {
-        return $this->belongsTo(Location::class, 'source_location_id');
+        return $this->belongsTo(Location::class, 'source_location_id')
+            ->withDefault(['location_name' => 'Lokasi Tidak Ditemukan']);
     }
 
-    public function destinationLocation()
+    public function destinationLocation(): BelongsTo
     {
-        return $this->belongsTo(Location::class, 'destination_location_id');
+        return $this->belongsTo(Location::class, 'destination_location_id')
+            ->withDefault(['location_name' => 'Lokasi Tidak Ditemukan']);
     }
 
     public function creator()

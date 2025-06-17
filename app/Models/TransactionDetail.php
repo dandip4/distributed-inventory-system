@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TransactionDetail extends Model
 {
@@ -22,13 +23,13 @@ class TransactionDetail extends Model
         'total_price' => 'decimal:2'
     ];
 
-    public function transaction()
+    public function transaction(): BelongsTo
     {
-        return $this->belongsTo(Transaction::class, 'transaction_id');
+        return $this->belongsTo(Transaction::class);
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(MasterProduct::class, 'product_id');
+        return $this->belongsTo(MasterProduct::class);
     }
 }

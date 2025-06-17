@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LocationController extends Controller
 {
@@ -55,9 +56,38 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
-        $location->delete();
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('locations.index')
-            ->with('success', 'Lokasi berhasil dihapus');
+            // Cek apakah lokasi memiliki stok
+            if ($location->stocks()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lokasi tidak dapat dihapus karena masih memiliki stok'
+                ]);
+            }
+
+            // Cek apakah lokasi terlibat dalam transaksi
+            if ($location->sourceTransactions()->exists() || $location->destinationTransactions()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lokasi tidak dapat dihapus karena terlibat dalam transaksi'
+                ]);
+            }
+
+            $location->delete();
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lokasi berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus lokasi'
+            ]);
+        }
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Location extends Model
 {
@@ -16,18 +18,20 @@ class Location extends Model
         'country'
     ];
 
-    public function stocks()
+    public function stocks(): HasMany
     {
         return $this->hasMany(LocationStock::class, 'location_id');
     }
 
-    public function sourceTransactions()
+    public function sourceTransactions(): HasMany
     {
-        return $this->hasMany(Transaction::class, 'source_location_id');
+        return $this->hasMany(Transaction::class, 'source_location_id')
+            ->withDefault();
     }
 
-    public function destinationTransactions()
+    public function destinationTransactions(): HasMany
     {
-        return $this->hasMany(Transaction::class, 'destination_location_id');
+        return $this->hasMany(Transaction::class, 'destination_location_id')
+            ->withDefault();
     }
 }

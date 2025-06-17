@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\MasterProduct;
 use App\Models\MasterCategory;
 use App\Models\MasterUnit;
+use Illuminate\Container\Attributes\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class ProductController extends Controller
 {
@@ -67,9 +69,21 @@ class ProductController extends Controller
 
     public function destroy(MasterProduct $product)
     {
-        $product->delete();
+        try {
+            FacadesDB::beginTransaction();
+            $product->delete();
+            FacadesDB::commit();
 
-        return redirect()->route('products.index')
-            ->with('success', 'Produk berhasil dihapus');
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            FacadesDB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
