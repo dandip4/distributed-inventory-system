@@ -8,6 +8,8 @@
 <script src="{{ asset('template/backend/assets') }}/js/plugins/feather.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- ApexCharts untuk grafik dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script src="{{ asset('template/backend/assets') }}/js/plugins/flatpickr.min.js"></script>
 

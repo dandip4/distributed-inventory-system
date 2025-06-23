@@ -14,6 +14,7 @@ return new class extends Migration
             $table->enum('type', ['in', 'out', 'transfer']);
             $table->unsignedBigInteger('source_location_id')->nullable();
             $table->unsignedBigInteger('destination_location_id')->nullable();
+            $table->text('destination_info')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

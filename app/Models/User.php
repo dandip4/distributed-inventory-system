@@ -12,6 +12,9 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    // Koneksi ke database master
+    protected $connection = 'master';
+
     /**
      * The attributes that are mass assignable.
      *

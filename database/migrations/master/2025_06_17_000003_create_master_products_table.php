@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('product_name', 255);
             $table->foreignId('category_id')->constrained('master_categories');
             $table->foreignId('unit_id')->constrained('master_units');
+            $table->decimal('cost_price', 15, 2)->default(0);
+            $table->decimal('selling_price', 15, 2)->default(0);
             $table->integer('min_stock')->default(0);
             $table->integer('max_stock')->default(0);
             $table->boolean('is_active')->default(true);

@@ -16,6 +16,7 @@ class Transaction extends Model
         'type',
         'source_location_id',
         'destination_location_id',
+        'destination_info',
         'notes'
     ];
 

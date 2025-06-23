@@ -14,9 +14,17 @@ class MasterProduct extends Model
         'product_name',
         'category_id',
         'unit_id',
+        'cost_price',
+        'selling_price',
         'min_stock',
         'max_stock',
         'is_active'
+    ];
+
+    protected $casts = [
+        'cost_price' => 'decimal:2',
+        'selling_price' => 'decimal:2',
+        'is_active' => 'boolean'
     ];
 
     public function category()

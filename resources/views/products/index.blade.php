@@ -1,4 +1,5 @@
 @extends('layouts.main')
+
 @section('container')
     <section class="pc-container">
         <div class="pc-content">
@@ -13,67 +14,111 @@
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-0">Produk</h2>
+                                <h2 class="mb-0">Daftar Produk</h2>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5>Daftar Produk</h5>
-                                <div>
-                                    <a href="{{ route('products.create') }}" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Tambah Data
-                                    </a>
-                                </div>
+                                <h5>Data Produk</h5>
+                                <a href="{{ route('products.create') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Tambah Produk
+                                </a>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="dt-responsive">
-                                <table id="dom-jqry" class="table table-striped table-bordered nowrap">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="products-table">
                                     <thead>
                                         <tr>
-                                            <th style="width: 30px; text-align: center;">No</th>
+                                            <th>No</th>
                                             <th>Kode</th>
-                                            <th>Nama</th>
+                                            <th>Nama Produk</th>
                                             <th>Kategori</th>
-                                            <th>Satuan</th>
+                                            <th>Unit</th>
+                                            <th>Harga Beli</th>
+                                            <th>Harga Jual</th>
+                                            <th>Margin</th>
                                             <th>Stok Min</th>
                                             <th>Stok Max</th>
-                                            <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($products as $product)
+                                        @forelse($products as $index => $product)
                                             <tr>
-                                                <td style="width: 30px; text-align: center;">{{ $loop->iteration }}</td>
-                                                <td>{{ $product->product_code }}</td>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ $product->product_code }}</span>
+                                                </td>
                                                 <td>{{ $product->product_name }}</td>
                                                 <td>{{ $product->category->category_name }}</td>
-                                                <td>{{ $product->unit->unit_name }}</td>
-                                                <td>{{ $product->min_stock }}</td>
-                                                <td>{{ $product->max_stock }}</td>
+                                                <td>{{ $product->unit->unit_symbol }}</td>
+                                                <td>Rp {{ number_format($product->cost_price, 0, ',', '.') }}</td>
+                                                <td>Rp {{ number_format($product->selling_price, 0, ',', '.') }}</td>
                                                 <td>
-                                                    <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-secondary' }}">
-                                                        {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}
+                                                    @php
+                                                        $margin = $product->selling_price - $product->cost_price;
+                                                        $marginPercent = $product->cost_price > 0 ? ($margin / $product->cost_price) * 100 : 0;
+                                                    @endphp
+                                                    <span class="badge bg-success">
+                                                        Rp {{ number_format($margin, 0, ',', '.') }}
+                                                        ({{ number_format($marginPercent, 1) }}%)
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning btn-sm me-1">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteData({{ $product->id }})">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
+                                                    <span class="badge bg-warning">{{ $product->min_stock }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">{{ $product->max_stock }}</span>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <a href="{{ route('products.show', $product->id) }}"
+                                                           class="btn btn-sm btn-info" title="Detail">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{{ route('products.edit', $product->id) }}"
+                                                           class="btn btn-sm btn-warning" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('products.destroy', $product->id) }}"
+                                                              method="POST" class="d-inline"
+                                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="11" class="text-center">Tidak ada data produk</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -86,62 +131,14 @@
 
     @push('scripts')
         <script>
-            function deleteData(id) {
-                Swal.fire({
-                    title: 'Apakah Kamu Yakin?',
-                    text: "Kamu ingin menghapus data ini!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`/products/${id}`, {
-                                method: "DELETE",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Accept": "application/json",
-                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire('Berhasil!', data.message, 'success').then(() => {
-                                        location.reload();
-                                    });
-                                } else {
-                                    Swal.fire('Gagal!', data.message, 'error');
-                                }
-                            })
-                            .catch(error => {
-                                Swal.fire('Error!', 'Terjadi kesalahan saat menghapus data.', 'error');
-                            });
+            $(document).ready(function() {
+                $('#products-table').DataTable({
+                    responsive: true,
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json'
                     }
                 });
-            }
-
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: "{{ session('success') }}",
-                    timer: 2100,
-                    timerProgressBar: true,
-                    showConfirmButton: true,
-                });
-            @elseif (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: "{{ session('error') }}",
-                    timer: 2100,
-                    timerProgressBar: true,
-                    showConfirmButton: true,
-                });
-            @endif
+            });
         </script>
     @endpush
 @endsection

@@ -25,9 +25,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('stocks.index') }}">Stok</a>
                     </li>
-                    {{-- <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('transactions.index') }}">Transaksi</a>
-                    </li> --}}
+                    </li>
                 </ul>
             </div>
         </div>

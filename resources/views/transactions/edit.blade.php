@@ -10,12 +10,13 @@
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="/">Home</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('transactions.index') }}">Transaksi</a></li>
-                                <li class="breadcrumb-item" aria-current="page">Buat Transaksi</li>
+                                <li class="breadcrumb-item"><a href="{{ route('transactions.show', $transaction->id) }}">Detail</a></li>
+                                <li class="breadcrumb-item" aria-current="page">Edit</li>
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-0">Buat Transaksi Baru</h2>
+                                <h2 class="mb-0">Edit Transaksi</h2>
                             </div>
                         </div>
                     </div>
@@ -26,7 +27,7 @@
                 <div class="col-sm-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5>Form Transaksi</h5>
+                            <h5>Form Edit Transaksi</h5>
                         </div>
                         <div class="card-body">
                             @if($errors->any())
@@ -40,30 +41,26 @@
                                 </div>
                             @endif
 
-                            <form action="{{ route('transactions.store') }}" method="POST" id="transactionForm">
+                            <form action="{{ route('transactions.update', $transaction->id) }}" method="POST" id="transactionForm">
                                 @csrf
+                                @method('PUT')
 
-                                <!-- Transaction Header -->
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
-                                            <label for="transaction_number" class="form-label">Nomor Transaksi <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control @error('transaction_number') is-invalid @enderror"
-                                                   id="transaction_number" name="transaction_number"
-                                                   value="{{ old('transaction_number', $transactionNumber) }}" required readonly>
-                                            @error('transaction_number')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                            <label for="transaction_number" class="form-label">Nomor Transaksi</label>
+                                            <input type="text" class="form-control" id="transaction_number"
+                                                   value="{{ $transaction->transaction_number }}" readonly>
                                         </div>
 
                                         <div class="form-group mb-3">
                                             <label for="type" class="form-label">Tipe Transaksi <span class="text-danger">*</span></label>
                                             <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
                                                 <option value="">Pilih Tipe Transaksi</option>
-                                                <option value="in" {{ old('type') == 'in' ? 'selected' : '' }}>Masuk</option>
-                                                <option value="out" {{ old('type') == 'out' ? 'selected' : '' }}>Keluar</option>
-                                                <option value="transfer" {{ old('type') == 'transfer' ? 'selected' : '' }}>Transfer</option>
-                                        </select>
+                                                <option value="in" {{ old('type', $transaction->type) == 'in' ? 'selected' : '' }}>Masuk</option>
+                                                <option value="out" {{ old('type', $transaction->type) == 'out' ? 'selected' : '' }}>Keluar</option>
+                                                <option value="transfer" {{ old('type', $transaction->type) == 'transfer' ? 'selected' : '' }}>Transfer</option>
+                                            </select>
                                             @error('type')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -72,30 +69,30 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
-                                        <label for="source_location_id" class="form-label">Lokasi Sumber</label>
+                                            <label for="source_location_id" class="form-label">Lokasi Sumber</label>
                                             <select class="form-select @error('source_location_id') is-invalid @enderror" id="source_location_id" name="source_location_id">
                                                 <option value="">Pilih Lokasi Sumber</option>
-                                            @foreach($locations as $location)
-                                                    <option value="{{ $location->id }}" {{ old('source_location_id') == $location->id ? 'selected' : '' }}>
+                                                @foreach($locations as $location)
+                                                    <option value="{{ $location->id }}" {{ old('source_location_id', $transaction->source_location_id) == $location->id ? 'selected' : '' }}>
                                                         {{ $location->location_name }}
                                                     </option>
-                                            @endforeach
-                                        </select>
+                                                @endforeach
+                                            </select>
                                             @error('source_location_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                    </div>
+                                        </div>
 
                                         <div class="form-group mb-3">
-                                        <label for="destination_location_id" class="form-label">Lokasi Tujuan</label>
+                                            <label for="destination_location_id" class="form-label">Lokasi Tujuan</label>
                                             <select class="form-select @error('destination_location_id') is-invalid @enderror" id="destination_location_id" name="destination_location_id">
                                                 <option value="">Pilih Lokasi Tujuan</option>
-                                            @foreach($locations as $location)
-                                                    <option value="{{ $location->id }}" {{ old('destination_location_id') == $location->id ? 'selected' : '' }}>
+                                                @foreach($locations as $location)
+                                                    <option value="{{ $location->id }}" {{ old('destination_location_id', $transaction->destination_location_id) == $location->id ? 'selected' : '' }}>
                                                         {{ $location->location_name }}
                                                     </option>
-                                            @endforeach
-                                        </select>
+                                                @endforeach
+                                            </select>
                                             @error('destination_location_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -105,7 +102,7 @@
                                             <label for="destination_info" class="form-label">Ke Mana <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control @error('destination_info') is-invalid @enderror"
                                                    id="destination_info" name="destination_info"
-                                                   value="{{ old('destination_info') }}"
+                                                   value="{{ old('destination_info', $transaction->destination_info) }}"
                                                    placeholder="Contoh: Customer A, Supplier B, dll">
                                             @error('destination_info')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -117,7 +114,7 @@
                                 <div class="form-group mb-4">
                                     <label for="notes" class="form-label">Catatan</label>
                                     <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3"
-                                              placeholder="Catatan tambahan (opsional)">{{ old('notes') }}</textarea>
+                                              placeholder="Catatan tambahan (opsional)">{{ old('notes', $transaction->notes) }}</textarea>
                                     @error('notes')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -125,57 +122,68 @@
 
                                 <hr>
 
-                                <!-- Products Section -->
                                 <div class="card">
                                     <div class="card-header">
                                         <h6 class="mb-0">Detail Produk</h6>
                                     </div>
                                     <div class="card-body">
                                         <div id="products-container">
-                                            <div class="product-row row mb-3" data-index="0">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Produk <span class="text-danger">*</span></label>
-                                                    <select class="form-select product-select" name="products[0][product_id]" required>
-                                                        <option value="">Pilih Produk</option>
-                                                        @foreach($products as $product)
-                                                            <option value="{{ $product->id }}"
-                                                                    data-cost="{{ $product->cost_price }}"
-                                                                    data-selling="{{ $product->selling_price }}">
-                                                                {{ $product->product_name }} ({{ $product->product_code }})
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                            @foreach($transaction->details as $index => $detail)
+                                                <div class="product-row row mb-3" data-index="{{ $index }}">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Produk <span class="text-danger">*</span></label>
+                                                        <select class="form-select product-select" name="products[{{ $index }}][product_id]" required>
+                                                            <option value="">Pilih Produk</option>
+                                                            @foreach($products as $product)
+                                                                <option value="{{ $product->id }}"
+                                                                        data-cost="{{ $product->cost_price }}"
+                                                                        data-selling="{{ $product->selling_price }}"
+                                                                        {{ $detail->product_id == $product->id ? 'selected' : '' }}>
+                                                                    {{ $product->product_name }} ({{ $product->product_code }})
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                                                        <input type="number" class="form-control quantity-input"
+                                                               name="products[{{ $index }}][quantity]" min="1"
+                                                               value="{{ $detail->quantity }}" required>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Tipe Harga <span class="text-danger">*</span></label>
+                                                        <select class="form-select price-type-select" name="products[{{ $index }}][price_type]" required>
+                                                            <option value="">Pilih</option>
+                                                            <option value="cost" {{ $detail->unit_price == $detail->product->cost_price ? 'selected' : '' }}>Harga Beli</option>
+                                                            <option value="selling" {{ $detail->unit_price == $detail->product->selling_price ? 'selected' : '' }}>Harga Jual</option>
+                                                            <option value="custom" {{ $detail->unit_price != $detail->product->cost_price && $detail->unit_price != $detail->product->selling_price ? 'selected' : '' }}>Custom</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Harga Unit <span class="text-danger">*</span></label>
+                                                        <input type="number" class="form-control unit-price-input"
+                                                               name="products[{{ $index }}][unit_price]" min="0" step="0.01"
+                                                               value="{{ $detail->unit_price }}" required>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Total</label>
+                                                        <input type="text" class="form-control total-price-display"
+                                                               value="Rp {{ number_format($detail->total_price, 0, ',', '.') }}" readonly>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        @if($index > 0)
+                                                            <button type="button" class="btn btn-danger btn-sm remove-product">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        @else
+                                                            <button type="button" class="btn btn-danger btn-sm remove-product" style="display: none;">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                                                    <input type="number" class="form-control quantity-input"
-                                                           name="products[0][quantity]" min="1" required>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Tipe Harga <span class="text-danger">*</span></label>
-                                                    <select class="form-select price-type-select" name="products[0][price_type]" required>
-                                                        <option value="">Pilih</option>
-                                                        <option value="cost">Harga Beli</option>
-                                                        <option value="selling">Harga Jual</option>
-                                                        <option value="custom">Custom</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Harga Unit <span class="text-danger">*</span></label>
-                                                    <input type="number" class="form-control unit-price-input"
-                                                           name="products[0][unit_price]" min="0" step="0.01" required>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Total</label>
-                                                    <input type="text" class="form-control total-price-display" readonly>
-                                                </div>
-                                                <div class="col-md-1">
-                                                    <label class="form-label">&nbsp;</label>
-                                                    <button type="button" class="btn btn-danger btn-sm remove-product" style="display: none;">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            @endforeach
                                         </div>
 
                                         <div class="text-center mt-3">
@@ -192,11 +200,11 @@
                                                         <h6 class="card-title">Total Transaksi</h6>
                                                         <div class="d-flex justify-content-between">
                                                             <span>Total Item:</span>
-                                                            <span id="total-items">0</span>
+                                                            <span id="total-items">{{ $transaction->details->sum('quantity') }}</span>
                                                         </div>
                                                         <div class="d-flex justify-content-between">
                                                             <span>Total Nilai:</span>
-                                                            <span id="total-value">Rp 0</span>
+                                                            <span id="total-value">Rp {{ number_format($transaction->details->sum('total_price'), 0, ',', '.') }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -207,9 +215,9 @@
 
                                 <div class="text-center mt-4">
                                     <button type="submit" class="btn btn-primary me-2">
-                                        <i class="fas fa-save"></i> Simpan Transaksi
+                                        <i class="fas fa-save"></i> Update Transaksi
                                     </button>
-                                    <a href="{{ route('transactions.index') }}" class="btn btn-secondary">
+                                    <a href="{{ route('transactions.show', $transaction->id) }}" class="btn btn-secondary">
                                         <i class="fas fa-times"></i> Batal
                                     </a>
                                 </div>
@@ -224,7 +232,23 @@
     @push('scripts')
     <script>
         $(document).ready(function() {
-            let productIndex = 0;
+            let productIndex = {{ $transaction->details->count() - 1 }};
+
+            // Initialize destination info group visibility
+            function updateDestinationInfoVisibility() {
+                const type = $('#type').val();
+
+                if (type === 'out') {
+                    $('#destination_info_group').show();
+                    $('#destination_info').prop('required', true);
+                } else {
+                    $('#destination_info_group').hide();
+                    $('#destination_info').prop('required', false);
+                }
+            }
+
+            // Call on page load
+            updateDestinationInfoVisibility();
 
             // Handle transaction type change
             $('#type').change(function() {
@@ -352,8 +376,10 @@
                 $('#total-value').text(`Rp ${totalValue.toLocaleString()}`);
             }
 
-            // Bind events to first row
-            bindProductEvents($('.product-row:first'));
+            // Bind events to all existing rows
+            $('.product-row').each(function() {
+                bindProductEvents($(this));
+            });
 
             // Form validation
             $('#transactionForm').submit(function(e) {
