@@ -38,6 +38,12 @@
     <!-- ======= MASTER DATA ======= -->
     <li class="pc-item pc-caption"><label>Master Data</label></li>
     <li class="pc-item">
+        <a href="{{ route('employes.index') }}" class="pc-link">
+            <span class="pc-micon"><i class="fas fa-user"></i></span>
+            <span class="pc-mtext">Pegawai</span>
+        </a>
+    </li>
+    <li class="pc-item">
         <a href="{{ route('master.categories.index') }}" class="pc-link">
             <span class="pc-micon"><i class="fas fa-tags"></i></span>
             <span class="pc-mtext">Kategori</span>

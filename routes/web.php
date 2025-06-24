@@ -7,6 +7,12 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeController;
+
+// Landing Page Route
+Route::get('/', function () {
+    return view('landing');
+})->name('landing');
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -23,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('locations', LocationController::class);
     Route::resource('stocks', StockController::class);
     Route::resource('transactions', TransactionController::class);
+    Route::resource('employes', EmployeController::class);
 
     // API Routes for AJAX
     Route::get('/api/product-price', [TransactionController::class, 'getProductPrice'])->name('api.product-price');

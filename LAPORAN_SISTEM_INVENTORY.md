@@ -837,3 +837,4 @@ Sistem inventory terdistribusi ini telah berhasil mengatasi masalah-masalah yang
 ---
 
 *Laporan ini disusun sebagai dokumentasi lengkap implementasi sistem inventory terdistribusi menggunakan arsitektur distributed database dengan Laravel framework.* 
+ 
